@@ -29,7 +29,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('real_dir', type=Path)
     parser.add_argument('save_dir', type=Path)
-    parser.add_argument('partition', type=str) # choices=['test', 'finaltest']
+    parser.add_argument('partition', type=str, choices=['train', 'val', 'test'])
     parser.add_argument('n_nodes', type=int)
     parser.add_argument('--glob', type=str, default='*.txt')
     parser.add_argument('--n_instances_per_example', type=int, default=None)

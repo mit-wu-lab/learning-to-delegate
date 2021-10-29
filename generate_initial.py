@@ -69,7 +69,7 @@ def generate_i(gen_args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('save_dir', type=Path)
-    parser.add_argument('partition', type=str, choices=['train', 'finaltest', 'test', 'benchmark'])
+    parser.add_argument('partition', type=str, choices=['train', 'val', 'test'])
     parser.add_argument('n_nodes', type=int)
     parser.add_argument('--n_c', type=int, default=0, help='Number of city clusters in the problem instance')
     parser.add_argument('--mixed', action='store_true')

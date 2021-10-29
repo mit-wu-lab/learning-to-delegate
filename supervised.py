@@ -598,13 +598,14 @@ parser.add_argument('--activation', type=str, default='ReLU')
 parser.add_argument('--step', type=int, default=None)
 
 parser.add_argument('--eval', action='store_true')
-parser.add_argument('--eval_partition', type=str, default='test', choices=['train', 'test', 'finaltest', 'benchmark', 'real'])
+parser.add_argument('--eval_partition', type=str, default='val', choices=['train', 'val', 'test'])
 parser.add_argument('--n_step_eval', type=int, default=1000)
 
 parser.add_argument('--generate', action='store_true')
 parser.add_argument('--save_dir', type=Path, default=None)
 parser.add_argument('--save_suffix', type=str, default=None)
-parser.add_argument('--generate_partition', type=str, default='test') # choices=['train', 'test', 'finaltest', 'benchmark', 'real', 'finalreal']
+parser.add_argument('--generate_partition', type=str, default='val', choices=['train', 'val', 'test'])
+parser.add_argument('--generate_partition_suffix', type=str, default='')
 parser.add_argument('--n_step_generate', type=int, default=None)
 parser.add_argument('--generate_step_zero', action='store_true')
 parser.add_argument('--generate_index_start', type=int, default=0)
@@ -639,7 +640,7 @@ type_map = {a.dest: a.type for a in parser._actions}
 
 if __name__ == '__main__':
     args = parser.parse_args()
-
+    args.generate_partition += args.generate_partition_suffix
     args.train_dir.mkdir(parents=True, exist_ok=True)
     args.model_save_dir = args.train_dir / 'models'
 

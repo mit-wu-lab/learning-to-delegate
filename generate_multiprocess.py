@@ -51,7 +51,8 @@ def generate_i(gen_args):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('dataset_dir', type=Path)
-parser.add_argument('partition', type=str) # choices=['train', 'test', 'finaltest', 'benchmark', 'real', 'finalreal']
+parser.add_argument('partition', type=str, choices=['train', 'val', 'test'])
+parser.add_argument('--partition_suffix', type=str, default='')
 parser.add_argument('--save_dir', type=Path, default=Path('save'))
 parser.add_argument('--ptype', type=str, default='CVRP', choices=['CVRP', 'CVRPTW', 'VRPMPD'])
 parser.add_argument('--window_distance_scale', type=float, default=0)
@@ -84,6 +85,7 @@ def get_partition(args):
 
 if __name__ == '__main__':
     args = parser.parse_args()
+    args.partition += args.partition_suffix
     args.dataset_dir.mkdir(parents=True, exist_ok=True)
 
     args.partition_dir = get_partition(args)
