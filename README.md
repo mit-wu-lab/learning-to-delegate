@@ -4,19 +4,21 @@ We provide clean and extensible code, data, and models for subproblem selection 
 We include model configurations and pretrained models for all experiments from our paper, which can be applied on given problem instances. We additionally include generated data for training all of these models.
 
 ## Overview
-To apply our method on a given VRP distribution, we take the following steps (described in full details in our paper)
+To apply our method and baseline methods on a given VRP distribution, we take the following steps (described in full details in our paper)
 
-1. `generate_[initial,real_world].py`: Generate the problem instances. This may need to be repeated several times to generate training, validation, and/or test sets.
+1. `generate_[initial,real_world].py`: [Generating Problem Instances](#generating-problem-instances). This may need to be repeated several times to generate training, validation, and/or test sets.
 2. Training
-    1. `generate_multiprocess.py`: Generate training data. We collect training trajectories by enumerating over all the subproblems at each step with a subsolver. We only collect training data for VRP distributions that we train on.
-    2. `preprocess[_subproblems,].py`: Preprocess training data. We aggregate training data into a single file with more accessible formats for training. `preprocess_subproblems.py` preprocesses for regression, while `preprocess.py` preprocesses for classification.
-    3. `concat_preprocessed.py`: If needed, we concatenate multiple preprocessing outputs into a single file to merge datasets for training.
-    4. `supervised.py`: Training subproblem selection model. We train on our model on the training data while tracking loss on the validation set. The VRP distributions that we train models for are discussed in our paper.
-5. `supervised.py`: Generating solution trajectories on validation or test set. This runs our iterative framework with a trained subproblem selection model (regression or classification).
-6. `generate_multiprocess.py`: Generating solution trajectories with subproblem selection baseline methods (Random, Min Count, Max Min Dist) on validation or test set.
-7. `run_[lkh,hgs].py`: Obtaining solutions with only the subsolver (i.e. only LKH-3 or HGS).
+    1. `generate_multiprocess.py`: [Generating Training and Validation Data](#generating-training-and-validation-data). We collect training trajectories by enumerating over all the subproblems at each step with a subsolver. We only collect training data for VRP distributions that we train on.
+    2. [Preprocessing Training and Validation Data](#preprocessing-training-and-validation-data)
+        1. `preprocess[_subproblems,].py`: Preprocess training data. We aggregate training data into a single file with more accessible formats for training. `preprocess_subproblems.py` preprocesses for regression, while `preprocess.py` preprocesses for classification.
+        2. `concat_preprocessed.py`: If needed, we concatenate multiple preprocessing outputs into a single file to merge datasets for training.
+    4. `supervised.py`: Training [Regression](#regression) or [Classification](#classification) subproblem selection model. We train on our model on the training data while tracking loss on the validation set. The VRP distributions that we train models for are discussed in our paper.
+5. `supervised.py`: [Generating Solution Trajectories](#generating-solution-trajectories). This runs our iterative framework with a trained subproblem selection model (regression or classification).
+6. Generating baseline solutions
+    1. `generate_multiprocess.py`: [Subproblem Selection Baselines](#subproblem-selection-baselines).
+    2. `run_[lkh,hgs].py`: [LKH-3](#lkh-3-baseline) or [HGS](#hgs-baseline) Baseline. Obtaining solutions using only the subsolver (i.e. only LKH-3 or HGS) without subproblem selection.
 
-The commands that we give below uses the directory structure as shown in the Data and Model Checkpoints section below. If present, the arguments `n_cpus`, `n_process`, and/or `n_threads_per_process` control how much computational resources should be used.
+The commands that we give below uses the directory structure as shown in the [Data and Model Checkpoints](#data-and-model-checkpoints) section below. If present, the arguments `n_cpus`, `n_process`, and/or `n_threads_per_process` control how much computational resources should be used.
 
 We give a rough estimate of the single-CPU computation time (except for training) of each process under the Uniform CVRP section. In practice we leverage parallelism to run multiple instances in parallel.
 
@@ -68,11 +70,11 @@ learning-to-delegate/ # Top directory of this Github repo
 
 This zip also contains sample solution trajectories of our iterative framework and baselines for `N = 2000` uniform CVRP, comparing our method with the Random and LKH-3 baselines from the paper, as detailed below. Besides these samples, we do not provide other solution trajectories as solution times are benchmarked using our own servers, and other servers are likely to see different solutions times. Practitioners may generate their own solutions by using the code in this repo and our trained models, as described below.
 
-When using problem instances and training data from the zip, you should skip the Generating Problem Instance step and the Generating Training and Validation Data step (which is the most computation intensive).
+When using problem instances and training data from the zip, you should skip the [Generating Problem Instances](#generating-problem-instances) step and the [Generating Training and Validation Data](#generating-training-and-validation-data) step (which is the most computation intensive).
 
 **Note that problem instances do contain initialization times specific to our machines**, which are relatively insignificant overall. If you'd like to compute initialization times on your own machines, you may want to generate new `test` set instances.
 
-If only using trained model checkpoints from the zip, you can skip all data generation, data preprocessing, and training steps.
+If only using trained model checkpoints from the zip, you can go straight to [Generating Solution Trajectories](#generating-solution-trajectories) and baselines ([Subproblem Selection Baselines](#subproblem-selection-baselines), [LKH-3 Baseline](#lkh-3-baseline), or [HGS Baseline](#hgs-baseline)).
 
 ## Environment Setup
 We implement our models with PyTorch in Python 3.8. We include setup instructions here.
@@ -93,7 +95,7 @@ Follow the instructions in `lkh3/LKH-3.0.4/README.txt` to compile [LKH-3](http:/
 Follow the instructions in `hgs/HGS-CVRP/README.md` to compile [HGS](https://github.com/vidalt/HGS-CVRP).
 
 ## Uniform CVRP
-### Generating Problem Instance
+### Generating Problem Instances
 Given a problem instance size 500, 1000, 2000, or 3000 (or any other integer), these commands generates 2000 instances for `train` set, 40 instances for `val` set, and 40 for `test` set. `SAVE_DIR` can be set arbitrarily.
 
 This should be relatively quick (less than one minute) per instance.
@@ -120,8 +122,8 @@ export N_RUNS=5 # use 1 for experimentation to save time
 python run_lkh.py $SAVE_DIR/lkh $SPLIT --save_dir $SAVE_DIR --n_lkh_trials $LKH_STEPS --n_cpus 40 --index_start 0 --index_end $NUM_INSTANCES --n_runs $N_RUNS --init_tour
 ```
 
-### Subproblem Selection Baselines: Random, Min Count, Max Min Dist
-This should take ~10 minutes to over an hour per instance, depending on the `N`, `K`, and `DEPTH`. Note that generation may terminate early before `DEPTH` iterations have been run.
+### Subproblem Selection Baselines
+As described in our paper, these are the Random, Min Count, Max Min Dist baseline. Each baseline should take ~10 minutes to over an hour per instance, depending on the `N`, `K`, and `DEPTH`. Note that generation may terminate early before `DEPTH` iterations have been run.
 ```
 export SPLIT=val # options: [val,test]
 export NUM_INSTANCES=40
@@ -231,7 +233,7 @@ MKL_NUM_THREADS=1 python supervised.py $DATASET_DIR $TRAIN_DIR --generate --step
 
 ## Clustered and Mixed CVRP
 For clustered and mixed CVRP distributions, only the problem generation differs from uniform CVRP.
-### Generating Problem Instance
+### Generating Problem Instances
 Given a problem instance size `N = [500,1000,2000]`, `NC = [3,5,7]` cluster centers, and whether we want clustered or mixed CVRP distributions, these commands generates 500 instances for `train` set, 10 instances for `val` set, and 10 for `test` set. Note that we do not train on `N = 2000` data, so there's no need to generate training instances for `N = 2000`. `SAVE_DIR` can be set arbitrarily.
 
 This should be relatively quick (less than one minute) per instance.
@@ -253,7 +255,7 @@ python generate_initial.py $SAVE_DIR_MIXED $SPLIT $N --n_c $NC --mixed --n_insta
 
 ## Real-world CVRP
 For the real-world CVRP distribution, only the problem generation differs from uniform CVRP.
-### Generating Problem Instance
+### Generating Problem Instances
 We generate our real-world distribution from real-world CVRP instances found in the `VRP_Instances_Belgium` directory. We only need to generate `N = 2000` instances for the `val` and `test` sets, as we do not train on this distribution.
 
 ```
@@ -281,32 +283,32 @@ export N_RUNS=5 # use 1 for experimentation to save time
 python run_hgs.py $SAVE_DIR/hgs $SPLIT --save_dir $SAVE_DIR --time_threshold $T --n_cpus 40 --index_start 0 --index_end $NUM_INSTANCES --n_runs $N_RUNS
 ```
 
-### Subproblem Selection Baselines: Random
-This is very similar to the command above for LKH-3 subproblem selection baselines. We additionally set the following environmental variables.
+### Subproblem Selection Baselines
+This is very similar to the [Subproblem Selection Baselines](#subproblem-selection-baselines) commands for LKH-3. We additionally set the following environmental variables.
 ```
 export DATASET_DIR=$SAVE_DIR/subproblem_selection_hgs
 export T=1 # We run HGS for 1 second on each subproblem
 export K=10
 export DEPTH=2000 # use [2000,4500,15000,40000] respectively for N = [500,1000,2000,3000]
 ```
-We add the following flags to the LKH-3 command: `--solver HGS --time_threshold $T`.
+We add the following flags to the previous command: `--solver HGS --time_threshold $T`.
 
 ### Training
-The training data generation process and training process are identical to the LKH-3 based process above, so we do not repeat commands here.
+The training data generation process and training process are identical to the LKH-3 based [Training](#training) above, so we do not repeat commands here.
 
 ### Generating Solution Trajectories
-This is very similar to the command above for LKH-3 subproblem selection baselines. We additionally set the following environmental variables.
+This is very similar to the command for [Generating Solution Trajectories](#generating-solution-trajectories) with the LKH-3 subsolver. We additionally set the following environmental variables.
 ```
 export T=1 # We run HGS for 1 second on each subproblem
 export DEPTH=2000 # use [2000,4500,15000,40000] respectively for N = [500,1000,2000,3000]
 ```
-We add the following flags to the LKH-3 command: `--solver HGS --time_threshold $T`.
+We add the following flags to the previous command: `--solver HGS --time_threshold $T`.
 
 ## CVRPTW
 For the CVRPTW distribution, the main difference from uniform CVRP is in problem generation.
 
 For other steps of the framework, add `--ptype CVRPTW` as an argument to every uniform CVRP command above. Note that HGS does not handle CVRPTW problem instances.
-### Generating Problem Instance
+### Generating Problem Instances
 ```
 export SPLIT=val # options: [train,val,test]
 export N=500 # options: [500,1000,2000,3000]
@@ -319,7 +321,8 @@ python generate_initial.py $SAVE_DIR $SPLIT $N --ptype CVRPTW --service_time 0.2
 For the CVRPTW distribution, the main difference from uniform CVRP is in problem generation.
 
 For other steps of the framework, add `--ptype VRPMPD` as an argument to every uniform CVRP command above. Note that HGS does not handle CVRPTW problem instances.
-### Generating Problem Instance
+
+### Generating Problem Instances
 We use a capacity of `25` instead of `50` as this keeps route lengths around the same as CVRP.
 ```
 export SPLIT=val # options: [train,val,test]
@@ -333,17 +336,17 @@ python generate_initial.py $SAVE_DIR $SPLIT $N --ptype VRPMPD --capacity 25 --n_
 We include commands for other ablations described in our appendix.
 
 ### Initialization Ablation
-We must generate the initial problems with the default initialization first, before generating alternative initial solutions for the same problems. Therefore, **after running the `generate_initial.py` command in Generating Problem Instance**, we run the **`generate_initial.py` command** again with additional flag `--naive_init` for the `L = 0` initialization method in the paper or `--n_lkh_trials $L` for initialization methods running `L` LKH steps on each initialization partition.
+We must generate the initial problems with the default initialization first, before generating alternative initial solutions for the same problems. Therefore, **after running the `generate_initial.py` command in [Generating Problem Instances](#generating-problem-instances)**, we run the **`generate_initial.py` command** again with additional flag `--naive_init` for the `L = 0` initialization method in the paper or `--n_lkh_trials $L` for initialization methods running `L` LKH steps on each initialization partition.
 
-For generating solution trajectories with subproblem selection baselines (`generate_multiprocess.py`), we add an additional flag `--partition_suffix initnaive` or `--partition_suffix lkh$L`, respectively. For generating solution trajectories with our trained model (`supervised.py`), we run the same command with additional flag `--generate_partition_suffix initnaive` or `--generate_partition_suffix lkh$L`.
+For generating solution trajectories for [Subproblem Selection Baselines](#subproblem-selection-baselines) (`generate_multiprocess.py`), we add an additional flag `--partition_suffix initnaive` or `--partition_suffix lkh$L`, respectively. For [Generating Solution Trajectories](#generating-solution-trajectories) with our trained model (`supervised.py`), we run the same command with additional flag `--generate_partition_suffix initnaive` or `--generate_partition_suffix lkh$L`.
 
 ### Architecture Ablation
 #### FCNN
 For this ablation, we use the same preprocessed training and validation data as our regression method, therefore the only change adding the `--fc_only` flag to the training command, which replaces the Transformer with a fully connected neural network.
 
 #### Linear, MLP, RandomForest
-For these ablation, the input format consists of 33 features representing the statistics of each subproblem, so we need to use a different preprocessing for the training and validation data by running the `preprocess_subproblems.py` command from Preprocessing Training and Validation Data with the additional `--statistics` flag.
+For these ablation, the input format consists of 33 features representing the statistics of each subproblem, so we need to use a different preprocessing for the training and validation data by running the `preprocess_subproblems.py` command from [Preprocessing Training and Validation Data](#preprocessing-training-and-validation-data) with the additional `--statistics` flag.
 
 Similarly, we run the `concat_preprocessed.py` command (remember to change `PATH1`, `PATH2`, and `OUT_PATH` accordingly to end with `_subproblem_statistics.npz` instead of `_subproblems.npz`) with the additional `--statistics` flag.
 
-Finally, for training we run the `supervised.py` command with the additional arguments `--fit_statistics --use_sklearn --sklearn_parameters $SKLEARN_PARAMS`, where `SKLEARN_PARAMS` is expressed in YAML format. In particular, we use `SKLEARN_PARAMS="model: ElasticNet\nalpha: 0"` for Linear or `SKLEARN_PARAMS="model: MLPRegressor\nalpha: 0"` for MLP. **We do not recommend training with a RandomForest-based model**, which achieves similar validation MSE as Linear or MLP but takes up excessive disk space (e.g. 30Gb) when stored and is too memory intensive to execute for generating solution trajectories in parallel.
+Finally, for [Training](#training) we run the `supervised.py` command with the additional arguments `--fit_statistics --use_sklearn --sklearn_parameters $SKLEARN_PARAMS`, where `SKLEARN_PARAMS` is expressed in YAML format. In particular, we use `SKLEARN_PARAMS="model: ElasticNet\nalpha: 0"` for Linear or `SKLEARN_PARAMS="model: MLPRegressor\nalpha: 0"` for MLP. **We do not recommend training with a RandomForest-based model**, which achieves similar validation MSE as Linear or MLP but takes up excessive disk space (e.g. 30Gb) when stored and is too memory intensive to execute for generating solution trajectories in parallel.
