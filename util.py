@@ -42,7 +42,7 @@ def get_lkh_executable(url="http://www.akira.ruc.dk/~keld/research/LKH-3/LKH-3.0
         os.remove(file)
 
     executable = os.path.join(filedir, "LKH")
-    assert os.path.isfile(executable)
+    assert os.path.isfile(executable), f'Cannot find LKH-3 executable file at {executable}'
     return os.path.abspath(executable)
 
 def get_hgs_executable(url="https://github.com/vidalt/HGS-CVRP.git"):
@@ -61,7 +61,7 @@ def get_hgs_executable(url="https://github.com/vidalt/HGS-CVRP.git"):
         check_call("make test", cwd=os.path.join(filedir, "Program"), shell=True)
 
     executable = os.path.join(os.path.join(filedir, "Program"), "genvrp")
-    assert os.path.isfile(executable)
+    assert os.path.isfile(executable), f'Cannot find HGS executable file at {executable}'
     return os.path.abspath(executable)
 
 executable = get_lkh_executable()
@@ -122,14 +122,16 @@ def read_vrplib_input(filename):
                 append = demands
             elif line.startswith('DEPOT_SECTION'):
                 append = depots
-            elif line.startswith('EOF'):
+            elif line.startswith('EOF') or line.startswith('END'):
                 break
             elif append is not None:
                 append.append(line.rstrip().split())
         coordinates = np.array(coordinates).astype(int)[:, 1:]
         demands = np.array(demands).astype(int)[:, 1]
-        depots = np.array(depots).astype(int)
-        assert depots[0] == 1 and depots[1] == -1 and demands[0] == 0
+        if len(depots):
+            depots = np.array(depots).astype(int)
+            assert depots[0] == 1 and depots[1] == -1
+        assert demands[0] == 0
     return coordinates, demands, capacity, ptype
 
 def read_vrplib_solution(filename, n):

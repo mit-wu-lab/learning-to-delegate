@@ -2,7 +2,7 @@ from util import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('path_or_globs', type=Path, nargs='+')
-parser.add_argument('--statistic', action='store_true')
+parser.add_argument('--statistics', action='store_true')
 parser.add_argument('output', type=Path)
 
 if __name__ == '__main__':

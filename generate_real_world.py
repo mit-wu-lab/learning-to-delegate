@@ -6,8 +6,9 @@ def generate_i(gen_args):
     np.random.seed(seed)
     start_time = time()
     if args.n_nodes > 0:
-        print(f'Generating problem {i} from problem of size {len(xys)}...')
-        idxs = 1 + np.random.choice(len(xys), size=args.n_nodes, replace=False)
+        n_nodes_original = len(xys) - 1
+        print(f'Generating problem {i} from problem of size {n_nodes_original}...')
+        idxs = 1 + np.random.choice(n_nodes_original, size=args.n_nodes, replace=False)
         xys = np.concatenate((xys[:1], xys[idxs].astype(np.float32)), axis=0)
         demands = demands[idxs]
     xymin = xys.min(axis=0, keepdims=True)

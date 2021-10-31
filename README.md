@@ -20,7 +20,9 @@ To apply our method and baseline methods on a given VRP distribution, we take th
     1. `generate_multiprocess.py`: [Subproblem Selection Baselines](#subproblem-selection-baselines).
     2. `run_[lkh,hgs].py`: [LKH-3](#lkh-3-baseline) or [HGS](#hgs-baseline) Baseline. Obtaining solutions using only the subsolver (i.e. only LKH-3 or HGS) without subproblem selection.
 
-The commands that we give below creates the directory structure as shown in [Directory Structure](#directory-structure). If present, the arguments `n_cpus`, `n_process`, and/or `n_threads_per_process` control how much computational resources should be used.
+The commands that we give below creates the directory structure as shown in [Directory Structure](#directory-structure). If present, the arguments `n_cpus`, `n_process`, and/or `n_threads_per_process` control how much computational resources should be used. Note that for the final paper we measure runtime for each instance on a **single thread**.
+1. Set `n_threads_per_process` to `1` when running `generate_initial.py` or `generate_real_world.py`
+2. Do not use the `n_threads_per_process` argument when generating solution trajectories with subproblem selection baselines (`generate_multiprocess.py`). This will let `n_threads_per_process` be `1`.
 
 We give a rough estimate of the single-CPU computation time (except for training) of each process under the Uniform CVRP section. In practice we leverage parallelism to run multiple instances in parallel.
 
@@ -75,7 +77,7 @@ learning-to-delegate/  # Top directory of this Github repo
 
 When using problem instances and training data from the zip, you should skip [Generating Problem Instances](#generating-problem-instances) and [Generating Training and Validation Data](#generating-training-and-validation-data) (which is the most computationally intensive step).
 
-**Note that problem instances in the zip file do contain initialization times specific to our machines**, which are relatively insignificant overall. If you'd like to compute initialization times on your own machines, you may want to generate new `test` set instances.
+**Note that problem instances in the zip file contain initialization times specific to our machines**, which are relatively insignificant overall. If you'd like to compute initialization times on your own machines, you may want to generate new `test` set instances.
 
 If only using trained model checkpoints from the zip file, you can skip straight to [Generating Solution Trajectories](#generating-solution-trajectories) and baselines ([Subproblem Selection Baselines](#subproblem-selection-baselines), [LKH-3 Baseline](#lkh-3-baseline), or [HGS Baseline](#hgs-baseline)).
 
@@ -90,6 +92,14 @@ conda create -n vrp python=3.8
 conda activate vrp
 conda install numpy scipy
 pip install pyyaml tensorboard
+pip install scikit-learn # Architecture ablations only
+
+# If you would like to run example.ipynb
+conda install pandas matplotlib
+conda install -c conda-forge notebook
+pip install ipykernel
+python -m ipykernel install --user --name vrp
+# Make sure to select the vrp kernel from jupyter
 ```
 
 Refer to the [PyTorch website](https://pytorch.org/) to install PyTorch 1.8 with GPU if possible.
@@ -110,8 +120,10 @@ This should be relatively quick (less than one minute) per instance.
 export SPLIT=val # options: [train,val,test]
 export N=500 # options: [500,1000,2000,3000]
 export SAVE_DIR=generations/uniform_N$N
+export N_INSTANCES=40 # 2000 for train, 40 for val and test. May set to less to save time
+export N_CPUS=40 # set this according to your compute budget
 
-python generate_initial.py $SAVE_DIR $SPLIT $N --n_process 40 --n_threads_per_process 1
+python generate_initial.py $SAVE_DIR $SPLIT $N --n_instances $N_INSTANCES --n_process $N_CPUS --n_threads_per_process 1
 ```
 
 ### LKH-3 Baseline
@@ -122,24 +134,23 @@ This should take several hours to run 30000 LKH steps per instance. Note that LK
 ```
 export SPLIT=val # options: [val,test]
 export LKH_STEPS=30000 # use 50000 for N = 3000
-export NUM_INSTANCES=40
 export N_RUNS=5 # use 1 for experimentation to save time
 
-python run_lkh.py $SAVE_DIR/lkh $SPLIT --save_dir $SAVE_DIR --n_lkh_trials $LKH_STEPS --n_cpus 40 --index_start 0 --index_end $NUM_INSTANCES --n_runs $N_RUNS --init_tour
+python run_lkh.py $SAVE_DIR/lkh $SPLIT --save_dir $SAVE_DIR --n_lkh_trials $LKH_STEPS --init_tour --index_start 0 --index_end $N_INSTANCES --n_runs $N_RUNS --n_cpus $N_CPUS
 ```
 
 ### Subproblem Selection Baselines
 As described in our paper, these are the Random, Min Count, Max Min Dist baseline. Each baseline should take ~10 minutes to over an hour per instance, depending on the `N`, `K`, and `DEPTH`. Note that generation may terminate early before `DEPTH` iterations have been run.
 ```
 export SPLIT=val # options: [val,test]
-export NUM_INSTANCES=40
 export METHOD=sample # options: use [sample,min_count,max_min_dist] for [Random, Min Count, Max Min Dist] respectively
 export K=10 # options: [5,10]
 export DEPTH=400 # respectively for N = [500,1000,2000,3000], use [400,600,1200,2000] for K = 10 or [1000,2000,3000,4500] for K = 5
+export N_INSTANCES=40
 export N_RUNS=5 # use 1 for experimentation to save time
 export DATASET_DIR=$SAVE_DIR/subproblem_selection_lkh
 
-MKL_NUM_THREADS=1 python generate_multiprocess.py $DATASET_DIR $SPLIT --save_dir $SAVE_DIR --n_lkh_trials 500 --n_cpus 40 --n_runs $N_RUNS --index_start 0 --index_end $NUM_INSTANCES --beam_width 1 --$METHOD --n_route_neighbors $K --generate_depth $DEPTH
+MKL_NUM_THREADS=1 python generate_multiprocess.py $DATASET_DIR $SPLIT --save_dir $SAVE_DIR --n_lkh_trials 500 --n_cpus $N_CPUS --n_runs $N_RUNS --index_start 0 --index_end $N_INSTANCES --beam_width 1 --$METHOD --n_route_neighbors $K --generate_depth $DEPTH
 ```
 
 The solutions trajectories are saved in a particular format; please see [Example Analysis and Plotting](#example-analysis-and-plotting) for how to unpack the trajectories.
@@ -148,12 +159,12 @@ The solutions trajectories are saved in a particular format; please see [Example
 This should take 30 mins to an hour **per instance** depending on the `N`, `K`, and `DEPTH`. We only generate data for `N = [500,1000]` for `K = 10` or `N = [500,1000,2000]` for `K = 5`.
 ```
 export SPLIT=train # options: [train,val] for training and validation respectively
-export NUM_INSTANCES=2000 # use 2000 for train and 40 for val
+export N_INSTANCES=2000 # use 2000 for train and 40 for val
 export K=10 # options: [5,10]
 export DEPTH=30 # for K = 10: use 30 for N = [500,1000]; for K = 5: use [40,80,160] for N = [500,1000,2000]
 export DATASET_DIR=$SAVE_DIR/subproblem_selection_lkh
 
-python generate_multiprocess.py $DATASET_DIR $SPLIT --save_dir $SAVE_DIR --n_lkh_trials 500 --n_cpus 40 --index_start 0 --index_end $NUM_INSTANCES --beam_width 1 --n_route_neighbors $K --generate_depth $DEPTH
+python generate_multiprocess.py $DATASET_DIR $SPLIT --save_dir $SAVE_DIR --n_lkh_trials 500 --n_cpus $N_CPUS --index_start 0 --index_end $N_INSTANCES --beam_width 1 --n_route_neighbors $K --generate_depth $DEPTH
 ```
 
 ### Regression
@@ -164,7 +175,7 @@ This should be very quick to run (less than 1 minute).
 export K=10 # options: [5,10]
 export DEPTH=30 # This should be the same as the depth used in Generating Training and Validation Data
 
-python preprocess_subproblems.py $DATASET_DIR val train --beam_width 1 --n_route_neighbors $K --generate_depth $DEPTH --n_cpus 40
+python preprocess_subproblems.py $DATASET_DIR val train --beam_width 1 --n_route_neighbors $K --generate_depth $DEPTH --n_cpus $N_CPUS
 ```
 
 Preprocessing should save some npz files, which can be used for training and validation. In our regression experiments (but not our classification experiments) we jointly train on preprocessed data from multiple problem sizes. Therefore we run `concat_preprocessed.py` to concatenate the training datas from different sizes, where `PATH1`, `PATH2`, ... are the paths to the saved npz files (whose names are printed by the `preprocess_subproblems.py` command above).
@@ -201,7 +212,7 @@ This should be very quick to run (less than 1 minute).
 export K=10 # options: [5,10]
 export DEPTH=30 # This should be the same as the depth used in Generating Training and Validation Data
 
-python preprocess.py $DATASET_DIR val train --beam_width 1 --n_route_neighbors $K --generate_depth $DEPTH --n_cpus 40
+python preprocess.py $DATASET_DIR val train --beam_width 1 --n_route_neighbors $K --generate_depth $DEPTH --n_cpus $N_CPUS
 ```
 
 Preprocessing should save some npz files, which can be used for training and validation.
@@ -231,12 +242,13 @@ export GENERATE_CHECKPOINT_STEP=40000
 
 export GENERATE_SAVE_DIR=$SAVE_DIR # This should be set as described above
 export GENERATE_PARTITION=val # options: [val,test]
-export GENERATE_SUFFIX=_abcdef # A suffix which helps distinguish between different $GENERATE_SAVE_DIR
+export GENERATE_SUFFIX=_val # A suffix which helps distinguish between different $GENERATE_SAVE_DIR
 
 export DEPTH=400 # respectively for N = [500,1000,2000,3000], use [400,600,1200,2000] for K = 10 or [1000,2000,3000,4500] for K = 5
+export N_INSTANCES=40
 export N_RUNS=5 # use 1 for experimentation to save time
 
-MKL_NUM_THREADS=1 python supervised.py $DATASET_DIR $TRAIN_DIR --generate --step $GENERATE_CHECKPOINT_STEP --generate_partition $GENERATE_PARTITION --save_dir $GENERATE_SAVE_DIR --save_suffix $GENERATE_SUFFIX --generate_depth $DEPTH --n_lkh_trials 500 --n_trajectories $N_RUNS --device cpu
+MKL_NUM_THREADS=1 python supervised.py $DATASET_DIR $TRAIN_DIR --generate --step $GENERATE_CHECKPOINT_STEP --generate_partition $GENERATE_PARTITION --save_dir $GENERATE_SAVE_DIR --save_suffix $GENERATE_SUFFIX --generate_depth $DEPTH --generate_index_start 0 --generate_index_end $N_INSTANCES --n_lkh_trials 500 --n_trajectories $N_RUNS --n_cpus $N_CPUS --device cpu
 ```
 The solutions trajectories are saved in a particular format; please see [Example Analysis and Plotting](#example-analysis-and-plotting) for how to unpack the trajectories.
 
@@ -254,12 +266,13 @@ export N=500 # options: [500,1000,2000,3000]
 export SAVE_DIR_CLUSTERED=generations/clustered_nc${NC}_N$N
 export SAVE_DIR_MIXED=generations/mixed_nc${NC}_N$N
 export N_INSTANCES=10 # options: 10 if SPLIT = [val,test]; 500 if SPLIT = train
+export N_CPUS=40 # set this according to your compute budget
 
 # Clustered
-python generate_initial.py $SAVE_DIR_CLUSTERED $SPLIT $N --n_c $NC --n_instances $N_INSTANCES --n_process 40 --n_threads_per_process 1
+python generate_initial.py $SAVE_DIR_CLUSTERED $SPLIT $N --n_c $NC --n_instances $N_INSTANCES --n_process $N_CPUS --n_threads_per_process 1
 
 # Mixed
-python generate_initial.py $SAVE_DIR_MIXED $SPLIT $N --n_c $NC --mixed --n_instances $N_INSTANCES --n_process 40 --n_threads_per_process 1
+python generate_initial.py $SAVE_DIR_MIXED $SPLIT $N --n_c $NC --mixed --n_instances $N_INSTANCES --n_process $N_CPUS --n_threads_per_process 1
 ```
 
 ## Real-world CVRP
@@ -273,8 +286,9 @@ export SAVE_DIR=generations/real_N2000
 export SPLIT=val # options: [val,test]
 export N=2000
 export N_INSTANCES_PER_EXAMPLE=5
+export N_CPUS=40 # set this according to your compute budget
 
-python generate_real_world.py $REAL_DIR $SAVE_DIR $SPLIT $N --n_instances_per_example $N_INSTANCES_PER_EXAMPLE --n_process 40 --n_threads_per_process 1
+python generate_real_world.py $REAL_DIR $SAVE_DIR $SPLIT $N --n_instances_per_example $N_INSTANCES_PER_EXAMPLE --n_process $N_CPUS --n_threads_per_process 1
 ```
 
 ## HGS Subsolver
@@ -286,10 +300,10 @@ For uniform distribution, we run HGS for `T = 1800, 4620, 8940, 30000` seconds f
 export SAVE_DIR=generations/uniform_N500 # This could be clustered, mixed, or real as well
 export T=1800 # Set this according to the instructions given
 export SPLIT=val # options: [val,test]
-export NUM_INSTANCES=40
+export N_INSTANCES=40 # 2000 for train, 40 for val and test. May set to less to save time
 export N_RUNS=5 # use 1 for experimentation to save time
 
-python run_hgs.py $SAVE_DIR/hgs $SPLIT --save_dir $SAVE_DIR --time_threshold $T --n_cpus 40 --index_start 0 --index_end $NUM_INSTANCES --n_runs $N_RUNS
+python run_hgs.py $SAVE_DIR/hgs $SPLIT --save_dir $SAVE_DIR --time_threshold $T --index_start 0 --index_end $N_INSTANCES --n_runs $N_RUNS --n_cpus $N_CPUS
 ```
 
 ### Subproblem Selection Baselines
@@ -322,8 +336,10 @@ For other steps of the framework, add `--ptype CVRPTW` as an argument to every u
 export SPLIT=val # options: [train,val,test]
 export N=500 # options: [500,1000,2000,3000]
 export SAVE_DIR=generations/cvrptw_uniform_N$N
+export N_CPUS=40 # set this according to your compute budget
+export N_INSTANCES=40 # 2000 for train, 40 for val and test. May set to less to save time
 
-python generate_initial.py $SAVE_DIR $SPLIT $N --ptype CVRPTW --service_time 0.2 --max_window_width 1.0 --n_process 40 --n_threads_per_process 1
+python generate_initial.py $SAVE_DIR $SPLIT $N --ptype CVRPTW --service_time 0.2 --max_window_width 1.0 --n_instances $N_INSTANCES --n_process $N_CPUS --n_threads_per_process 1
 ```
 
 ## VRPMPD
@@ -337,8 +353,10 @@ We use a capacity of `25` instead of `50` for VRPMPD as this keeps route lengths
 export SPLIT=val # options: [train,val,test]
 export N=500 # options: [500,1000,2000,3000]
 export SAVE_DIR=generations/vrpmpd_uniform_N$N
+export N_CPUS=40 # set this according to your compute budget
+export N_INSTANCES=40 # 2000 for train, 40 for val and test. May set to less to save time
 
-python generate_initial.py $SAVE_DIR $SPLIT $N --ptype VRPMPD --capacity 25 --n_process 40 --n_threads_per_process 1
+python generate_initial.py $SAVE_DIR $SPLIT $N --ptype VRPMPD --capacity 25 --n_instances $N_INSTANCES --n_process $N_CPUS --n_threads_per_process 1
 ```
 
 ## Other Ablations
@@ -362,3 +380,5 @@ Finally, for [Training](#training) we run the `supervised.py` command with the a
 
 ## Example Analysis and Plotting
 We provide the `example.ipynb` script for computing speedup and plotting our paper results for the example solution trajectories provided by our zip file. Besides these examples, we do not provide other solution trajectories as solution times are benchmarked using our own servers, and other servers are likely to see different solutions times. Solution trajectories can be generated using the code in this repo and our trained models from the zip file.
+
+Beyond demonstrating how to unpack the solution trajectory files, we do not elaborate more on the file format. Please refer to the code for full details.

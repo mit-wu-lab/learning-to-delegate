@@ -92,7 +92,7 @@ if __name__ == '__main__':
     parser.add_argument('--full_solver_init', action='store_true')
     args = parser.parse_args()
 
-    args.save_dir.mkdir(exist_ok=True)
+    args.save_dir.mkdir(parents=True, exist_ok=True)
     args.n_instances = args.n_instances or (2000 if args.partition == 'train' else 40)
 
     partition = args.partition

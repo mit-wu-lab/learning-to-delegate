@@ -367,7 +367,6 @@ class FCNetwork(nn.Module):
 
         if labels is None:
             return preds # Predicted distance
-        import q; q.d()
         if args.loss.endswith('clip'):
             clipped = labels >= prev_dists
             labels[clipped] = prev_dists[clipped]
@@ -396,7 +395,7 @@ def train(args, d, d_eval, d_generate):
         [writer.add_scalar(k, v, global_step=step, walltime=time() - start_time) for k, v in kwargs.items()]
 
     for step in range(start_step, args.n_steps + 1):
-        if step % args.n_step_save == 0:
+        if step % args.n_step_save == 0 or step == args.n_steps:
             args.model_save_dir.mkdir(exist_ok=True)
             ckpt = dict(step=step, net=net.state_dict(), opt=opt.state_dict())
             torch.save(ckpt, args.model_save_dir / f'{step}.pth')
@@ -491,10 +490,10 @@ class NetAC(ActionCallback):
             subps = p.get_subproblems(n_subproblems=args.n_subproblems, n_route_neighbors=args.n_route_neighbors, temperature=args.subproblem_temperature)
             subps_todo = [subp for subp in set(subps) if subp not in cache]
 
-            gen_batch_size = len(subps_todo) if args.use_sklearn else 256
+            gen_batch_size = len(subps_todo) if args.use_sklearn else args.n_batch
             if len(subps_todo):
                 for start in range(0, len(subps_todo), gen_batch_size):
-                    end = start + args.n_batch
+                    end = start + gen_batch_size
                     subps_batch = subps_todo[start: end]
                     prev_dists = np.array([subp.total_dist for subp in subps_batch])
                     if args.use_sklearn:
@@ -516,7 +515,8 @@ class NetAC(ActionCallback):
                 unique_masks=p.unique_mask,
             )
             data = Namespace((k, np.expand_dims(v, axis=0)) for k, v in data.items())
-            preds = self.net(self.prep(data)).cpu().numpy()[0]
+            with torch.no_grad():
+                preds = self.model(self.prep(data)).cpu().numpy()[0]
         self.traj_probs.append(preds)
         if args.sample:
             assert not args.sample
