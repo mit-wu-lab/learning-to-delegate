@@ -1,5 +1,7 @@
 # Learning to Delegate for Large-scale Vehicle Routing
-We provide clean and extensible code, data, and models for subproblem selection in large-scale vehicle problems (VRPs). Included in this directory are code and instructions to generate CVRP, CVRPTW, and VRPMPD problem instances with LKH-3 and HGS subsolvers (when applicable), run baselines mentioned in our paper, and train and evaluate subproblem regression and classification models.
+This directory contains the code, data, and model for our NeurIPS 2021 Spotlight paper *Learning to Delegate for Large-scale Vehicle Routing*, which applies subproblem selection to large-scale vehicle routing problems (VRPs). Our full paper can be found on [arXiv](https://arxiv.org/abs/2107.04139).
+
+Included in this directory are code and instructions to generate CVRP, CVRPTW, and VRPMPD problem instances with LKH-3 and HGS subsolvers (when applicable), run baselines mentioned in our paper, and train and evaluate subproblem regression and classification models.
 
 We include model configurations and pretrained models for all experiments from our paper, which can be applied on given problem instances. We additionally include generated data for training all of these models.
 
@@ -18,26 +20,30 @@ To apply our method and baseline methods on a given VRP distribution, we take th
     1. `generate_multiprocess.py`: [Subproblem Selection Baselines](#subproblem-selection-baselines).
     2. `run_[lkh,hgs].py`: [LKH-3](#lkh-3-baseline) or [HGS](#hgs-baseline) Baseline. Obtaining solutions using only the subsolver (i.e. only LKH-3 or HGS) without subproblem selection.
 
-The commands that we give below uses the directory structure as shown in the [Data and Model Checkpoints](#data-and-model-checkpoints) section below. If present, the arguments `n_cpus`, `n_process`, and/or `n_threads_per_process` control how much computational resources should be used.
+The commands that we give below creates the directory structure as shown in [Directory Structure](#directory-structure). If present, the arguments `n_cpus`, `n_process`, and/or `n_threads_per_process` control how much computational resources should be used.
 
 We give a rough estimate of the single-CPU computation time (except for training) of each process under the Uniform CVRP section. In practice we leverage parallelism to run multiple instances in parallel.
 
-### Data and Model Checkpoints
-We include a zip file with all training / validation data and model configurations / checkpoints at https://www.dropbox.com/s/37n002kezc3t3w0/learning-to-delegate.zip?dl=0. The file is 10Gb in size with many small files and may take 30 minutes to an hour to unzip.
-
-We list below the directory structure that the zip file contains. You may need to manually move `generations/` and `exps/` so they are under repo cloned from Github.
+### Directory Structure
+We list below the directory structure of this repo and a [zip file](https://www.dropbox.com/s/37n002kezc3t3w0/learning-to-delegate.zip?dl=0), which contains all training / validation data and model configurations / checkpoints. After unzipping the zip file, you may need to manually move `generations/` and `exps/` so they are under this repo cloned from Github. The zip file is 10Gb in size with many small files and may take 30 minutes to an hour to unzip.
 
 ```
-learning-to-delegate/ # Top directory of this Github repo
- ├─ generations/
+learning-to-delegate/  # Top directory of this Github repo
+ ├─ README.md  # This markdown file
+ ├─ *.py  # Code files
+ ├─ lkh3/  # LKH-3 solver
+ ├─ hgs/  # HGS solver
+ ├─ VRP_Instances_Belgium/  # Real-world dataset from https://antor.uantwerpen.be/xxlrouting/
+ ├─ example.ipynb  # Example script for computing speedup and plotting our paper's curves
+ ├─ generations/  # Zipped problem instances and solution trajectories
  │   ├─ uniform_N[500,1000,2000,3000]/
- │   │   ├─ problems_[train,val,test].npz # Problem instances with initializations
- │   │   ├─ subproblem_selection_lkh/ # Data from LKH-based subproblem selection
- │   │   │   ├─ train_routeneighbors10/ # k = 10
+ │   │   ├─ problems_[train,val,test].npz  # Problem instances with initializations
+ │   │   ├─ subproblem_selection_lkh/  # Data from LKH-based subproblem selection
+ │   │   │   ├─ train_routeneighbors10/  # k = 10
  │   │   │   │   └─ [0-1999].npz
  │   │   │   ├─ val_routeneighbors10/
  │   │   │   │   └─ [0-39].npz
- │   │   │   └─ [train,val]_routeneighbors5*/ # k = 5
+ │   │   │   └─ [train,val]_routeneighbors5*/  # k = 5
  │   │   └─ subproblem_selection_hgs/
  │   │       └─ [train,val]_routeneighbors10*/
  │   ├─ [clustered,mixed]_nc[3,5,7]_N[500,1000,2000]/
@@ -49,7 +55,7 @@ learning-to-delegate/ # Top directory of this Github repo
  │   │   │       └─ [0-9].npz
  │   │   └─ subproblem_selection_hgs/
  │   │       └─ [train,val]_routeneighbors10*/
- │   ├─ real_N2000/ # Problem instances in the real-world CVRP distribution
+ │   ├─ real_N2000/  # Problem instances in the real-world CVRP distribution
  │   │   └─ problems_[val,test].npz
  │   └─ [cvrptw,vrpmpd]_uniform_N500/
  │       ├─ problems_[train,val,test].npz
@@ -58,23 +64,23 @@ learning-to-delegate/ # Top directory of this Github repo
  │           │   └─ [0-1999].npz
  │           └─ val_routeneighbors5*/
  │               └─ [0-39].npz
- └─ exps/
+ └─ exps/  # Zipped trained models
      └─ [,cvrptw_,vrpmpd_][uniform,clustered]_[merge,N500,N1000,N2000]_routeneighbors[5,10]*/
          └─ <exp_name>/
-             ├─ config.yaml
-             ├─ events.out.tfevents.*
-             └─ models/
+             ├─ config.yaml  # Model parameters
+             ├─ events.out.tfevents.*  # Tensorboard log
+             └─ models/  # Model checkpoints
                  └─ [0,10000,20000,30000,40000].pth
-
 ```
 
-This zip also contains sample solution trajectories of our iterative framework and baselines for `N = 2000` uniform CVRP, comparing our method with the Random and LKH-3 baselines from the paper, as detailed below. Besides these samples, we do not provide other solution trajectories as solution times are benchmarked using our own servers, and other servers are likely to see different solutions times. Practitioners may generate their own solutions by using the code in this repo and our trained models, as described below.
+When using problem instances and training data from the zip, you should skip [Generating Problem Instances](#generating-problem-instances) and [Generating Training and Validation Data](#generating-training-and-validation-data) (which is the most computationally intensive step).
 
-When using problem instances and training data from the zip, you should skip the [Generating Problem Instances](#generating-problem-instances) step and the [Generating Training and Validation Data](#generating-training-and-validation-data) step (which is the most computation intensive).
+**Note that problem instances in the zip file do contain initialization times specific to our machines**, which are relatively insignificant overall. If you'd like to compute initialization times on your own machines, you may want to generate new `test` set instances.
 
-**Note that problem instances do contain initialization times specific to our machines**, which are relatively insignificant overall. If you'd like to compute initialization times on your own machines, you may want to generate new `test` set instances.
+If only using trained model checkpoints from the zip file, you can skip straight to [Generating Solution Trajectories](#generating-solution-trajectories) and baselines ([Subproblem Selection Baselines](#subproblem-selection-baselines), [LKH-3 Baseline](#lkh-3-baseline), or [HGS Baseline](#hgs-baseline)).
 
-If only using trained model checkpoints from the zip, you can go straight to [Generating Solution Trajectories](#generating-solution-trajectories) and baselines ([Subproblem Selection Baselines](#subproblem-selection-baselines), [LKH-3 Baseline](#lkh-3-baseline), or [HGS Baseline](#hgs-baseline)).
+
+The zip file also contains example solution trajectories of our iterative framework and baselines for `N = 2000` uniform CVRP, comparing our method with the Random and LKH-3 baselines from the paper, as detailed in [Example Analysis and Plotting](#example-analysis-and-plotting).
 
 ## Environment Setup
 We implement our models with PyTorch in Python 3.8. We include setup instructions here.
@@ -136,6 +142,8 @@ export DATASET_DIR=$SAVE_DIR/subproblem_selection_lkh
 MKL_NUM_THREADS=1 python generate_multiprocess.py $DATASET_DIR $SPLIT --save_dir $SAVE_DIR --n_lkh_trials 500 --n_cpus 40 --n_runs $N_RUNS --index_start 0 --index_end $NUM_INSTANCES --beam_width 1 --$METHOD --n_route_neighbors $K --generate_depth $DEPTH
 ```
 
+The solutions trajectories are saved in a particular format; please see [Example Analysis and Plotting](#example-analysis-and-plotting) for how to unpack the trajectories.
+
 ### Generating Training and Validation Data
 This should take 30 mins to an hour **per instance** depending on the `N`, `K`, and `DEPTH`. We only generate data for `N = [500,1000]` for `K = 10` or `N = [500,1000,2000]` for `K = 5`.
 ```
@@ -181,7 +189,7 @@ This should take around 6 hours on a NVIDIA V100 GPU. Here we provide the comman
 ```
 export K=10 # options: [5,10], this should be the same as the generated data
 export TRAIN_DIR=exps/regression_model # The name can be arbitrary
-export TRAIN_STEPS=40000
+export TRAIN_STEPS=40000 # The validation loss at step 40000 is always the best
 
 python supervised.py $MERGED_DATASET_DIR $TRAIN_DIR --data_suffix $DATA_SUFFIX --fit_subproblem --augment_rotate --augment_flip --lr 0.001 --n_batch 2048 --n_layers 6 --transformer_heads 8 --n_route_neighbors $K --n_steps $TRAIN_STEPS
 ```
@@ -230,6 +238,7 @@ export N_RUNS=5 # use 1 for experimentation to save time
 
 MKL_NUM_THREADS=1 python supervised.py $DATASET_DIR $TRAIN_DIR --generate --step $GENERATE_CHECKPOINT_STEP --generate_partition $GENERATE_PARTITION --save_dir $GENERATE_SAVE_DIR --save_suffix $GENERATE_SUFFIX --generate_depth $DEPTH --n_lkh_trials 500 --n_trajectories $N_RUNS --device cpu
 ```
+The solutions trajectories are saved in a particular format; please see [Example Analysis and Plotting](#example-analysis-and-plotting) for how to unpack the trajectories.
 
 ## Clustered and Mixed CVRP
 For clustered and mixed CVRP distributions, only the problem generation differs from uniform CVRP.
@@ -323,7 +332,7 @@ For the CVRPTW distribution, the main difference from uniform CVRP is in problem
 For other steps of the framework, add `--ptype VRPMPD` as an argument to every uniform CVRP command above. Note that HGS does not handle CVRPTW problem instances.
 
 ### Generating Problem Instances
-We use a capacity of `25` instead of `50` as this keeps route lengths around the same as CVRP.
+We use a capacity of `25` instead of `50` for VRPMPD as this keeps route lengths around the same as CVRP.
 ```
 export SPLIT=val # options: [train,val,test]
 export N=500 # options: [500,1000,2000,3000]
@@ -350,3 +359,6 @@ For these ablation, the input format consists of 33 features representing the st
 Similarly, we run the `concat_preprocessed.py` command (remember to change `PATH1`, `PATH2`, and `OUT_PATH` accordingly to end with `_subproblem_statistics.npz` instead of `_subproblems.npz`) with the additional `--statistics` flag.
 
 Finally, for [Training](#training) we run the `supervised.py` command with the additional arguments `--fit_statistics --use_sklearn --sklearn_parameters $SKLEARN_PARAMS`, where `SKLEARN_PARAMS` is expressed in YAML format. In particular, we use `SKLEARN_PARAMS="model: ElasticNet\nalpha: 0"` for Linear or `SKLEARN_PARAMS="model: MLPRegressor\nalpha: 0"` for MLP. **We do not recommend training with a RandomForest-based model**, which achieves similar validation MSE as Linear or MLP but takes up excessive disk space (e.g. 30Gb) when stored and is too memory intensive to execute for generating solution trajectories in parallel.
+
+## Example Analysis and Plotting
+We provide the `example.ipynb` script for computing speedup and plotting our paper results for the example solution trajectories provided by our zip file. Besides these examples, we do not provide other solution trajectories as solution times are benchmarked using our own servers, and other servers are likely to see different solutions times. Solution trajectories can be generated using the code in this repo and our trained models from the zip file.
