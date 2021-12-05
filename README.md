@@ -2,7 +2,7 @@
 This directory contains the code, data, and model for our NeurIPS 2021 Spotlight paper *Learning to Delegate for Large-scale Vehicle Routing*, which applies subproblem selection to large-scale vehicle routing problems (VRPs). 
 
 ## Paper
-Our full paper can be found on [arXiv](https://arxiv.org/abs/2107.04139), or [OpenReview](https://openreview.net/forum?id=rm0I5y2zkG8). Our poster can be found in [this repo](https://github.com/mit-wu-lab/learning-to-delegate/blob/main/poster.png). If you find our code useful for your research, please cite our paper as follows:
+Our full paper can be found on [arXiv](https://arxiv.org/abs/2107.04139) and [OpenReview](https://openreview.net/forum?id=rm0I5y2zkG8). Our poster can be found in [this repo](https://github.com/mit-wu-lab/learning-to-delegate/blob/main/poster.png). If you find our code useful for your research, please cite our paper as follows:
 ```
 @inproceedings{
 li2021learning,
