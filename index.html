@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Sirui Li">
+    <meta name="generator" content="Hugo 0.83.1">
+    <title>Learning-to-delegate</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/album/">
+
+
+
+    <!-- Bootstrap core CSS -->
+<link href="bootstrap.min.css" rel="stylesheet">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+      a { text-decoration: none; }
+    </style>
+
+
+  </head>
+  <body>
+
+<!--<header>
+  <div class="collapse bg-dark" id="navbarHeader">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8 col-md-7 py-4">
+          <h4 class="text-white">About</h4>
+          <p class="text-muted">Add some information about the album below, the author, or any other background context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them off to some social networking sites or contact information.</p>
+        </div>
+        <div class="col-sm-4 offset-md-1 py-4">
+          <h4 class="text-white">Contact</h4>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-white">Follow on Twitter</a></li>
+            <li><a href="#" class="text-white">Like on Facebook</a></li>
+            <li><a href="#" class="text-white">Email me</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container">
+      <a href="#" class="navbar-brand d-flex align-items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="me-2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <strong>Album</strong>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+  </div>
+</header>
+-->
+<main>
+
+  <section class="py-5 container">
+    <div class="row py-lg-5">
+      <div class="col-lg-8 col-md-10 mx-auto text-center">
+        <h2 class="fw-light">Learning to Delegate for Large-scale Vehicle Routing</h2>
+        <br>
+        <p class="lead text-muted"> Sirui Li*,  Zhongxia Yan*,  Cathy Wu</p>
+        <br>
+        <figure>
+        <img src="img/pipeline_with_legend.png"  class="img-fluid" alt="...">
+        <figcaption><b>Figure 1:</b> Our iterative framework for VRP. From (c) to (d), our suboroblem selector selects a subproblem S (yellow).</figcaption>
+        </figure>
+<!--        <p>
+          <a href="#" class="btn btn-primary my-2">Main call to action</a>
+          <a href="#" class="btn btn-secondary my-2">Secondary action</a>
+        </p>-->
+      </div>
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <br><br>
+<!--        <h3>Abstract</h3>-->
+        <p>
+Vehicle routing problems (VRPs) form a class of combinatorial problems with wide practical applications. While previous heuristic or learning-based works achieve decent solutions on small problem instances of up to 100 cities, their performance deteriorates in large problems. This article presents a novel learning-augmented local search framework to solve large-scale VRP. The method iteratively improves the solution by identifying appropriate subproblems and <i>delegating</i> their improvement to a black box subsolver. At each step, we leverage spatial locality to consider only a linear number of subproblems, rather than exponential. We frame subproblem selection as regression and train a Transformer on a generated training set of problem instances. Our method accelerates state-of-the-art VRP solvers by 10x to 100x while achieving competitive solution qualities for VRPs with sizes ranging from 500 to 3000. Learned subproblem selection offers a 1.5x to 2x speedup over heuristic or random selection. Our results generalize to a variety of VRP distributions, variants, and solvers.
+        </p>
+        <div class="card">
+          <div class="card-header">
+            Citation
+          </div>
+          <div class="card-body">
+            <pre>
+    @inproceedings{
+        li2021learning,
+        title={Learning to delegate for large-scale vehicle routing},
+        author={Sirui Li and Zhongxia Yan and Cathy Wu},
+        booktitle={Thirty-Fifth Conference on Neural Information Processing Systems},
+        year={2021},
+        url={https://openreview.net/forum?id=rm0I5y2zkG8}
+    }
+            </pre>
+          </div>
+        </div>
+      </div>
+<!--
+      <div class="col-lg-10 col-md-12 mx-auto">
+        <p>
+            <h3>Related works</h3>
+          <b>Models and architectures: </b><a href="https://arxiv.org/abs/2111.03794">[Physics-informed neural operator]</a>,
+          <a href="https://arxiv.org/abs/2010.08895">[Fourier neural operator]</a>, <a href="https://arxiv.org/abs/2111.13587">[FNO-Transformer]</a>, <a href="https://arxiv.org/abs/2005.03180">[Model Reduction (PCA)]</a>,
+          <a href="https://arxiv.org/abs/2010.08895">[Graph neural operator]</a>, <a href="https://arxiv.org/abs/2010.08895">[Mutlipole graph neural operator]</a>,
+          <a href="https://arxiv.org/abs/2109.13459">[Multi-Wavelet neural operator]</a>, <a href="https://arxiv.org/abs/2105.14995">[Galerkin transformer]</a> <br>
+
+            <b>Applications: </b><a href="https://www.biorxiv.org/content/10.1101/2021.10.09.463779v1">[Cryo-EM / SARS-CoV-2]</a>,
+            <a href="https://arxiv.org/abs/2109.03697">[CO2 migration]</a>,
+            <a href="https://arxiv.org/abs/2102.07256">[Crystal plasticity]</a>, <a href="https://arxiv.org/abs/2108.05421">[Seismic wave]</a>,
+            <a href="https://arxiv.org/abs/2106.06898">[Kolmogorov flow]</a>, <a href="https://arxiv.org/abs/2110.10249">[Stochastic flow]</a>,
+            <a href="https://arxiv.org/abs/2110.07100">[Coastal floods]</a>, <a href="https://arxiv.org/abs/2108.09374">[Wave equation]</a>,
+            <a href="https://arxiv.org/abs/2111.04941">[PDE control]</a>, <a href="https://arxiv.org/abs/2111.10262">[Composites curing]</a>.
+          <br>
+
+            <b>Approximation theory: </b><a href="https://arxiv.org/abs/2108.08481">[Neural operator]</a>,<a href="https://arxiv.org/abs/2107.07562">[Fourier neural operator]</a><br><br>
+
+            <h3>Other resources</h3>
+            <b>Code: </b><a href="https://github.com/zongyi-li/fourier_neural_operator">[Fourier neural operator]</a>, <a href="https://github.com/devzhk/PINO">[Physics-informed neural operator]</a>, <a href="https://github.com/zongyi-li/graph-pde">[Graph neural operator]</a>, <a href="https://github.com/foldfelis/NeuralOperators.jl">[Fourier neural operator (Julia)]</a><br>
+
+            <b>Blog posts: </b><a href="https://zongyi-li.github.io/blog/2020/fourier-pde">[Fourier neural operator]</a>, <a href="https://zongyi-li.github.io/blog/2020/graph-pde">[Graph neural operator]</a><br>
+
+            <b>Media coverage: </b> <a href="https://www.youtube.com/watch?v=JnGPxZ9glVk">[GTC Keynote]</a>,
+                                <a href="https://www.youtube.com/watch?v=JnGPxZ9glVk">[Nvidia (Weather model)]</a>,
+                                <a href="https://www.newswise.com/coronavirus/waltzing-the-virus-study-on-covid-19-reproduction-earns-gordon-bell-special-prize-nomination/?article_id=760886">[Newswise (Covid)]</a>,
+                                <a href="https://www.technologyreview.com/2020/10/30/1011435/ai-fourier-neural-network-cracks-navier-stokes-and-partial-differential-equations/">[MIT Tech Review]</a>,
+                              <a href="https://www.quantamagazine.org/new-neural-networks-solve-hardest-equations-faster-than-ever-20210419/">[Quanta Magezine]</a>,
+                              <a href="https://towardsdatascience.com/ai-has-unlocked-a-key-scientific-hurdle-in-predicting-our-world-5343b4ed136e">[Towards Data Science]</a>,
+                              <a href="https://medium.com/swlh/artificial-intelligence-can-now-solve-a-mathematical-problem-that-can-make-researchers-life-easier-9602c869128">[Medium]</a><br>
+
+            <b>Talks/Videos: </b><a href="https://www.youtube.com/watch?v=JZVghfOmhPQ&list=PLVNifWxslHCDBMTlTpZlHymOhPtchk9mz&index=4&t=7s">[Simons Foundation]</a>,
+                            <a href="https://www.youtube.com/watch?v=Bd4KvlmGbY4">[U Washington]</a>,
+                         <a href="https://www.youtube.com/watch?v=0Ve9xwNJO2o">[U Toronto]</a>,
+                        <a href="https://www.cmu.edu/aced/sciML.html">[CMU]</a>
+        </p>
+      </div> -->
+    </div>
+  </div>
+  <div class="album py-5 bg-light">
+  <div class="container">
+    <div class="col-lg-8 col-md-10 mx-auto">
+      <h3>Useful links</h3><br>
+<p><b>Paper:</b> <a href="https://arxiv.org/abs/2107.04139">ArXiv</a>, <a href="">OpenReview</a><br>
+<b>Code + pretrained models:</b> <a href="https://github.com/mit-wu-lab/learning-to-delegate">Github</a><br>
+<b>Poster:</b> <a href="img/poster.png">poster.png</a></p>
+      </div>
+    </div>
+  </div>
+  <div class="album py-5">
+  <div class="container">
+    <div class="col-lg-8 col-md-10 mx-auto">
+      <h3>Model Architecture</h3><br>
+      <img src="img/architecture.png"  class="img-fluid" alt="...">
+      </div>
+    </div>
+  </div>
+
+  <div class="album py-5 bg-light">
+  <div class="container">
+    <div class="col-lg-8 col-md-10 mx-auto">
+      <h3>Experimental Results</h3><br>
+      TODO
+      </div>
+    </div>
+  </div>
+
+  <div class="album py-5">
+  <div class="container">
+    <div class="col-lg-8 col-md-10 mx-auto">
+      <h3>Acknowledgement</h3><br>
+<p>This research was supported by MIT Indonesia Seed Fund, US DOT DDETFP, and the MIT-IBM Watson AI Lab. The authors are grateful to the anonymous reviewers for detailed comments that substantially improved the article. The authors acknowledge the MIT SuperCloud and Lincoln Laboratory Supercomputing Center for providing (HPC, database, consultation) resources that have contributed to the research results reported within this paper. We also thank <a href="https://zongyi-li.github.io">Zongyi Li</a> for helpful discussions and technical advice throughout the project.</p>
+      </div>
+    </div>
+  </div>
+  </section>
+
+
+
+  <!-- <div class="album py-5">
+    <div class="container">
+      <div class="col-lg-10 col-md-12 mx-auto">
+        <h2>Results of neural operators</h2>
+        <br>
+
+        <h4> 1. Supervise Learning </h4>
+        <p class="lead text-muted"> We consider the 2-d Navier-Stokes equation for a viscous,
+incompressible fluid in vorticity form on the unit torus. In this experiment, we use neural operators to learn the operator mapping from the vorticity of the first time 10 time steps
+to that up to a later time step.</p>
+        <img class="img-fluid" src="img/fourier_ns1e4.png" class="rounded mx-auto d-block" >
+        <p class="lead text-muted"><br>FNO achieves better accuracy compared to CNN-based methods.
+            Further, it is capable of the zero-shot super-resolution.
+            It is trained on 64x64x20 resolution and evaluated on 256x256x80 resolution, in both space and time. </p>
+
+        <h4> 2. Inverse Problem</h4>
+        <p class="lead text-muted"> We use a function space Markov chain Monte Carlo (MCMC) method
+to draw samples from the posterior distribution of the initial vorticity
+in Navier-Stokes given sparse, noisy observations at a later time step. </p>
+        <img class="img-fluid" src="img/fourier_bayesian.png" class="rounded mx-auto d-block">
+        <p class="lead text-muted"><br>We generate 25,000 samples from the posterior (with a 5,000 sample burn-in period),
+requiring 30,000 evaluations of the forward operator. In sharp contrast, FNO takes 0.005s to evaluate a single instance while the traditional solver, after
+being optimized to use the largest possible internal time-step which does not lead to blow-up, takes
+2.2s.</p>
+
+        <h4> 3. Physics-Informed Neural Operator </h4>
+        <p class="lead text-muted"> When the equation is available, we can use the physics-informed loss to solve the equation.</p>
+        <img class="img-fluid" src="img/pino-re500.gif" class="rounded mx-auto d-block">
+        <p class="lead text-muted"><br> We propose the pre-train and test-time optimize scheme. During pre-train, we learn an operator from data.
+        During the test-time optimization, we solve the equation using PINN loss.</p>
+
+
+        <h4> 4. Kolmogorov Flows </h4>
+        <p class="lead text-muted"> The Kolmogorov Flow is a chaotic system, which is intrinsically instable.
+            Smaller errors will accumulate and make the simulation diverge from the truth. </p>
+        <img class="img-fluid" src="img/KF-Attractor.png" class="rounded mx-auto d-block">
+        <p class="lead text-muted"><br> We take a new perspective:
+            we predict long-time trajectories that, while eventually diverging from the truth,
+            still preserve the same orbit (attractor) of the system and its statistical properties. </p>
+
+          <h4> 5. FNO Transformer </h4>
+        <p class="lead text-muted"> Vision transformers have delivered tremendous success in representation learning. We propose Adaptive Fourier Neural Operator (AFNO) as an efficient token mixer that learns to mix in the Fourier domain.  </p>
+        <img class="img-fluid" src="img/mixer.jpeg" class="rounded mx-auto d-block">
+
+
+      </div>
+    </div>
+  </div> -->
+
+
+</main>
+
+
+    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+</html>
