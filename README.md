@@ -1,6 +1,20 @@
 # Learning to Delegate for Large-scale Vehicle Routing
-This directory contains the code, data, and model for our NeurIPS 2021 Spotlight paper *Learning to Delegate for Large-scale Vehicle Routing*, which applies subproblem selection to large-scale vehicle routing problems (VRPs). Our full paper can be found on [arXiv](https://arxiv.org/abs/2107.04139).
+This directory contains the code, data, and model for our NeurIPS 2021 Spotlight paper *Learning to Delegate for Large-scale Vehicle Routing*, which applies subproblem selection to large-scale vehicle routing problems (VRPs). 
 
+## Paper
+Our full paper can be found on [arXiv](https://arxiv.org/abs/2107.04139), or [OpenReview](https://openreview.net/forum?id=rm0I5y2zkG8). Our poster can be found in [this repo](https://github.com/mit-wu-lab/learning-to-delegate/blob/main/poster.png). If you find our code useful for your research, please cite our paper as follows:
+```
+@inproceedings{
+li2021learning,
+title={Learning to delegate for large-scale vehicle routing},
+author={Sirui Li and Zhongxia Yan and Cathy Wu},
+booktitle={Thirty-Fifth Conference on Neural Information Processing Systems},
+year={2021},
+url={https://openreview.net/forum?id=rm0I5y2zkG8}
+}
+```
+
+## Code Instruction
 Included in this directory are code and instructions to generate CVRP, CVRPTW, and VRPMPD problem instances with LKH-3 and HGS subsolvers (when applicable), run baselines mentioned in our paper, and train and evaluate subproblem regression and classification models.
 
 We include model configurations and pretrained models for all experiments from our paper, which can be applied on given problem instances. We additionally include generated data for training all of these models.
