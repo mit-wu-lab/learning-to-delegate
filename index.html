@@ -46,7 +46,7 @@
         <br>
         <figure>
         <img src="img/pipeline_with_legend.png"  class="img-fluid" alt="...">
-        <figcaption><b>Figure 1:</b> Our iterative framework for VRP. From (c) to (d), our suboroblem selector selects a subproblem S (yellow).</figcaption>
+        <figcaption><b>Figure 1:</b> Our iterative framework for VRP. We learn a function f<sub>θ</sub> to intelligently select a subproblem (yellow) in step (d) from a pool of subproblems in step (c). The selected subproblem is solved by a subsolver in step (e).</figcaption>
         </figure>
       </div>
       <div class="col-lg-8 col-md-10 mx-auto">
@@ -67,8 +67,7 @@ Vehicle routing problems (VRPs) form a class of combinatorial problems with wide
         booktitle={Thirty-Fifth Conference on Neural Information Processing Systems},
         year={2021},
         url={https://openreview.net/forum?id=rm0I5y2zkG8}
-    }
-            </pre>
+    }</pre>
           </div>
         </div>
       </div>
@@ -77,10 +76,10 @@ Vehicle routing problems (VRPs) form a class of combinatorial problems with wide
   <div class="album py-5 bg-light">
   <div class="container">
     <div class="col-lg-8 col-md-10 mx-auto">
-      <h3>Useful links</h3><br>
+      <h3>Project Links</h3><br>
 <p><b>Paper:</b> <a href="https://arxiv.org/abs/2107.04139">ArXiv</a>, <a href="">OpenReview</a><br>
 <b>Code + pretrained models:</b> <a href="https://github.com/mit-wu-lab/learning-to-delegate">Github</a><br>
-<b>Poster:</b> <a href="img/poster.png">poster.png</a></p>
+<b>Poster:</b> <a href="img/poster.png">png</a></p>
       </div>
     </div>
   </div>
@@ -88,6 +87,7 @@ Vehicle routing problems (VRPs) form a class of combinatorial problems with wide
   <div class="container">
     <div class="col-lg-8 col-md-10 mx-auto">
       <h3>Model Architecture</h3><br>
+      <p>We train a Transformer attention-based neural network to predict the solution quality of subsolvers. We use the prediction to decide which subproblem to solve with the subsolver next.</p>
       <img src="img/architecture.png"  class="img-fluid" alt="...">
       </div>
     </div>
@@ -97,6 +97,14 @@ Vehicle routing problems (VRPs) form a class of combinatorial problems with wide
   <div class="container">
     <div class="col-lg-8 col-md-10 mx-auto">
       <h3>Experimental Results</h3><br>
+      <p>We demonstrate typical plots for total cost vs time (top left), improvement vs time (bottom left), and speedup (right) of our method compared with non-learning baseline subproblem selection methods (Random, Min Count, Max Min Dist). The speedup of our learned method is the main focus of our paper. This particular set of plots demonstrates performance on uniform CVRP problem instances with N=1000 cities.</p>
+      <div class="row">
+        <div class="col"><img src="img/N1000_cost_improvement.png"  class="img-fluid" alt="..."></div>
+        <div class="col-lg-7"><img src="img/N1000_speedup.png"  class="img-fluid" alt="..."></div>
+      </div>
+      <br>
+      <h4>Considered Variations</h4>
+      <p>We demonstrate the robustness of our method across many experimental variations of problem properties and solution properties.</p>
     </div>
     <div class="col-lg-10 col-md-12 mx-auto">
       <table class="table table-bordered">
@@ -113,18 +121,18 @@ Vehicle routing problems (VRPs) form a class of combinatorial problems with wide
     </tr>
     <tr>
       <th scope="row"># Cities (N)</th>
-      <td><b>500</b>; 1000; 2000; 3000</td>
-      <td></td>
+      <td>500; 1000; <b>2000</b>; 3000</td>
+      <td><img src="img/variation_N.png"  class="img-fluid" alt="..."></td>
     </tr>
     <tr>
       <th scope="row">City Distribution</th>
-      <td><b>Uniform</b>; Clustered; Real World*</td>
-      <td></td>
+      <td><b>Uniform</b>; Clustered; Real World</td>
+      <td><img src="img/variation_distribution.png"  class="img-fluid" alt="..."></td>
     </tr>
     <tr>
       <th scope="row">Additional Constraints</th>
       <td><b>None (CVRP)</b>; Time Windows (CVRPTW); Pickup+Delivery (VRPMPD)</td>
-      <td></td>
+      <td><img src="img/variation_constraint.png"  class="img-fluid" alt="..."></td>
     </tr>
     <tr class="table-active">
     <td scope="row" colspan="3"><b>Solution Properties</b></td>
@@ -132,21 +140,21 @@ Vehicle routing problems (VRPs) form a class of combinatorial problems with wide
     <tr>
       <th scope="row">Initial Solution</th>
       <td><b>Partitioned LKH</b>; Randomized</td>
-      <td></td>
+      <td><img src="img/variation_initialization.png"  class="img-fluid" alt="..."></td>
     </tr>
     <tr>
       <th scope="row">Subproblem Size (k)</th>
       <td><b>k=10</b>; k=5 routes per subproblem</td>
-      <td></td>
+      <td><img src="img/variation_k.png"  class="img-fluid" alt="..."></td>
     </tr>
     <tr>
       <th scope="row">Subsolver</th>
       <td><b>LKH-3</b>; HGS</td>
-      <td></td>
+      <td><img src="img/variation_solver.png"  class="img-fluid" alt="..."></td>
     </tr>
   </tbody>
-  <caption><p>*Real-world dataset adapted from “Efficiently solving very large-scale routing problems” Arnold et al., Computers & Operations Research, 2019.<br>
-    <b>Bolded variations are assumed unless otherwise stated.</b></p>
+  <caption>
+    <p><b>Bolded variations are assumed unless otherwise stated.</b></p>
   </caption>
 </table>
       </div>
