@@ -1,16 +1,14 @@
-# Learning to Delegate for Large-scale Vehicle Routing 
-This directory contains the code, data, and model for our NeurIPS 2021 Spotlight paper *Learning to Delegate for Large-scale Vehicle Routing*, which applies subproblem selection to large-scale vehicle routing problems (VRPs). 
+# Learning to Delegate for Large-scale Vehicle Routing
+This directory contains the code, data, and model for our NeurIPS 2021 Spotlight paper *Learning to Delegate for Large-scale Vehicle Routing*, which applies subproblem selection to large-scale vehicle routing problems (VRPs).
 
-## Paper
-Our full paper can be found on [arXiv](https://arxiv.org/abs/2107.04139) and [OpenReview](https://openreview.net/forum?id=rm0I5y2zkG8). Our poster can be found in [the current repo](https://github.com/mit-wu-lab/learning-to-delegate/blob/main/poster.png). Our project webpage can be found [here](https://mit-wu-lab.github.io/learning-to-delegate/). If you find our code useful for your research, please cite our paper as follows:
+## Relevant Links
+You may find this project at: [arXiv](https://arxiv.org/abs/2107.04139), [Project Website](https://mit-wu-lab.github.io/learning-to-delegate/), [OpenReview](https://openreview.net/forum?id=rm0I5y2zkG8), [Poster](https://github.com/mit-wu-lab/learning-to-delegate/blob/gh-pages/img/poster.png).
 ```
-@inproceedings{
-li2021learning,
+@inproceedings{li2021learning,
 title={Learning to delegate for large-scale vehicle routing},
 author={Sirui Li and Zhongxia Yan and Cathy Wu},
 booktitle={Thirty-Fifth Conference on Neural Information Processing Systems},
-year={2021},
-url={https://openreview.net/forum?id=rm0I5y2zkG8}
+year={2021}
 }
 ```
 
